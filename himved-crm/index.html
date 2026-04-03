@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himved Herbals CRM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="login-container">
+            <div class="logo">
+                <h1>🌿 Himved Herbals</h1>
+                <p>Ayurvedic CRM System</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Login ID</label>
+                    <input type="text" id="login-id" required placeholder="Enter login ID">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app-screen" class="screen">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🌿 Himved</h2>
+                <span id="user-name-display"></span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-view="dashboard">📊 Dashboard</a>
+                <a href="#" class="nav-item" data-view="pipeline">📋 Pipeline</a>
+                <a href="#" class="nav-item" data-view="leads">👥 Leads</a>
+                <a href="#" class="nav-item" data-view="followups">📅 Follow-ups</a>
+                <a href="#" class="nav-item admin-only" data-view="agents">👨‍💼 Agents</a>
+                <a href="#" class="nav-item admin-only" data-view="reports">📈 Reports</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn btn-secondary btn-full">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="header-actions">
+                    <button id="add-lead-btn" class="btn btn-primary">+ Add Lead</button>
+                    <button id="bulk-upload-btn" class="btn btn-secondary">📤 Bulk Upload</button>
+                </div>
+            </header>
+
+            <!-- Views -->
+            <div id="views-container">
+                <!-- Dashboard View -->
+                <div id="dashboard-view" class="view active">
+                    <div class="stats-grid" id="admin-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <h3 id="total-leads">0</h3>
+                                <p>Total Leads</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-info">
+                                <h3 id="total-conversions">0</h3>
+                                <p>Conversions</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-info">
+                                <h3 id="total-revenue">₹0</h3>
+                                <p>Revenue</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-info">
+                                <h3 id="today-followups">0</h3>
+                                <p>Today's Follow-ups</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-sections">
+                        <div class="section-card">
+                            <h3>Agent Performance</h3>
+                            <div id="agent-performance-table"></div>
+                        </div>
+                        <div class="section-card">
+                            <h3>Recent Activity</h3>
+                            <div id="recent-activity"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pipeline View -->
+                <div id="pipeline-view" class="view">
+                    <div class="pipeline-container" id="pipeline-board">
+                        <!-- Kanban columns will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Leads View -->
+                <div id="leads-view" class="view">
+                    <div class="filters-bar">
+                        <input type="text" id="search-leads" placeholder="Search by name or phone..." class="search-input">
+                        <select id="filter-agent" class="filter-select">
+                            <option value="">All Agents</option>
+                        </select>
+                        <select id="filter-status" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="New">New</option>
+                            <option value="Attempted">Attempted</option>
+                            <option value="Connected">Connected</option>
+                            <option value="Interested">Interested</option>
+                            <option value="Follow-up">Follow-up</option>
+                            <option value="Converted">Converted</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                        <select id="filter-product" class="filter-select">
+                            <option value="">All Products</option>
+                        </select>
+                    </div>
+                    <div class="leads-table-container">
+                        <table class="leads-table" id="leads-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Product</th>
+                                    <th>Agent</th>
+                                    <th>Status</th>
+                                    <th>Last Follow-up</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leads-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Follow-ups View -->
+                <div id="followups-view" class="view">
+                    <div class="followup-tabs">
+                        <button class="tab-btn active" data-tab="today">Today</button>
+                        <button class="tab-btn" data-tab="overdue">Overdue</button>
+                        <button class="tab-btn" data-tab="upcoming">Upcoming</button>
+                    </div>
+                    <div id="followups-list" class="followups-list"></div>
+                </div>
+
+                <!-- Agents View (Admin Only) -->
+                <div id="agents-view" class="view">
+                    <button id="add-agent-btn" class="btn btn-primary mb-4">+ Add Agent</button>
+                    <div class="agents-grid" id="agents-grid"></div>
+                </div>
+
+                <!-- Reports View (Admin Only) -->
+                <div id="reports-view" class="view">
+                    <div class="reports-filters">
+                        <select id="report-agent" class="filter-select">
+                            <option value="">All Agents</option>
+                        </select>
+                        <input type="date" id="report-from-date" class="date-input">
+                        <input type="date" id="report-to-date" class="date-input">
+                        <button id="generate-report-btn" class="btn btn-primary">Generate Report</button>
+                    </div>
+                    <div id="report-results" class="report-results"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add/Edit Lead Modal -->
+    <div id="lead-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="lead-modal-title">Add Lead</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="lead-form">
+                <input type="hidden" id="lead-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="lead-phone" required pattern="[0-9]{10}" placeholder="10 digit mobile number" maxlength="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="lead-name" placeholder="Optional">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="lead-category" required onchange="updateProductOptions()">
+                            <option value="">Select Category</option>
+                            <option value="Psoriasis">Psoriasis</option>
+                            <option value="Sexual Wellness">Sexual Wellness</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Product *</label>
+                        <select id="lead-product" required>
+                            <option value="">Select Product</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Source</label>
+                        <select id="lead-source">
+                            <option value="Website">Website</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Google Ads">Google Ads</option>
+                            <option value="Referral">Referral</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group admin-only-field">
+                        <label>Assign Agent</label>
+                        <select id="lead-agent">
+                            <option value="">Select Agent</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="lead-status">
+                        <option value="New">New</option>
+                        <option value="Attempted">Attempted</option>
+                        <option value="Connected">Connected</option>
+                        <option value="Interested">Interested</option>
+                        <option value="Follow-up">Follow-up</option>
+                        <option value="Converted">Converted</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Lead</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lead Detail Modal -->
+    <div id="lead-detail-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="lead-detail-title">Lead Details</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="lead-detail-content">
+                <div class="lead-info-section">
+                    <h3>Lead Information</h3>
+                    <div id="lead-basic-info"></div>
+                </div>
+                <div class="call-section">
+                    <h3>Make a Call</h3>
+                    <div class="call-actions">
+                        <select id="call-status">
+                            <option value="">Call Status</option>
+                            <option value="Not Picked">Not Picked</option>
+                            <option value="Picked">Picked</option>
+                            <option value="Busy">Busy</option>
+                            <option value="Interested">Interested</option>
+                            <option value="Not Interested">Not Interested</option>
+                        </select>
+                        <textarea id="call-remark" placeholder="Add remark..." rows="2"></textarea>
+                        <div class="followup-date-picker" id="followup-date-container" style="display:none;">
+                            <label>Follow-up Date:</label>
+                            <input type="date" id="followup-date">
+                        </div>
+                        <button id="save-call-btn" class="btn btn-primary">Save Call Log</button>
+                    </div>
+                </div>
+                <div class="timeline-section">
+                    <h3>Activity Timeline</h3>
+                    <div id="activity-timeline"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Upload Modal -->
+    <div id="bulk-upload-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Bulk Upload Leads</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="bulk-upload-content">
+                <div class="upload-tabs">
+                    <button class="tab-btn active" data-upload-tab="paste">Paste Numbers</button>
+                    <button class="tab-btn" data-upload-tab="csv">CSV Upload</button>
+                </div>
+                <div id="paste-upload" class="upload-panel active">
+                    <textarea id="paste-numbers" placeholder="Paste phone numbers here (one per line or comma separated)" rows="8"></textarea>
+                </div>
+                <div id="csv-upload" class="upload-panel">
+                    <input type="file" id="csv-file" accept=".csv">
+                    <p class="help-text">CSV format: Phone, Name, Category, Product</p>
+                </div>
+                <div class="upload-options">
+                    <label>Assignment:</label>
+                    <select id="bulk-assign-type">
+                        <option value="manual">Manual Assign</option>
+                        <option value="roundrobin">Auto Assign (Round Robin)</option>
+                    </select>
+                    <select id="bulk-agent" class="admin-only-field">
+                        <option value="">Select Agent</option>
+                    </select>
+                </div>
+                <button id="process-bulk-btn" class="btn btn-primary btn-full">Process & Upload</button>
+                <div id="bulk-preview" class="bulk-preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Modal -->
+    <div id="agent-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="agent-modal-title">Add Agent</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="agent-form">
+                <input type="hidden" id="agent-id">
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" id="agent-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <input type="tel" id="agent-phone" required pattern="[0-9]{10}" maxlength="10">
+                </div>
+                <div class="form-group">
+                    <label>Login ID *</label>
+                    <input type="text" id="agent-login-id" required>
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="agent-password" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="agent-status">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Agent</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
